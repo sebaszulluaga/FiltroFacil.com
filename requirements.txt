@@ -7,3 +7,4 @@ groq>=0.10.0
 pillow>=10.0.0
 python-dotenv>=1.0.0
 pytesseract>=0.3.13
+jinja2
