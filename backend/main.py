@@ -8,6 +8,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from pathlib import Path
 
+# Manteniendo tu router de la API
 from backend.api.routes import router
 
 app = FastAPI(
@@ -26,18 +27,29 @@ app.add_middleware(
 
 app.include_router(router, prefix="/api")
 
-# Configuración de archivos estáticos y templates
+# Configuración de archivos estáticos y templates con rutas absolutas independientes
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 app.mount("/static", StaticFiles(directory=str(BASE_DIR / "frontend" / "static")), name="static")
 templates = Jinja2Templates(directory=str(BASE_DIR / "frontend" / "templates"))
 
 
+# CORRECCIÓN DE RUTAS: Sintaxis moderna para Jinja2 en FastAPI
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
-    return templates.TemplateResponse("index.html", context={"request": request})
+    # Pasamos 'request' como argumento de palabra clave y el contexto aparte si fuera necesario
+    return templates.TemplateResponse(
+        request=request, 
+        name="index.html", 
+        context={}  # Puedes añadir variables aquí dentro si las necesitas
+    )
 
 
 @app.get("/about", response_class=HTMLResponse)
 async def read_about(request: Request):
-    return templates.TemplateResponse("about.html", {"request": request})
+    # Corregido el error posicional que rompía Render
+    return templates.TemplateResponse(
+        request=request, 
+        name="about.html", 
+        context={}
+    )
