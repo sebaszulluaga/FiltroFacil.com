@@ -1,13 +1,13 @@
 from dotenv import load_dotenv
-
-# CRÍTICO: Cargar .env ANTES de cualquier import del backend
-load_dotenv()
+load_dotenv()  # Cargar variables de entorno primero
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
+from pathlib import Path
+
 from backend.api.routes import router
 
 app = FastAPI(
@@ -26,25 +26,20 @@ app.add_middleware(
 
 app.include_router(router, prefix="/api")
 
-app.mount("/static", StaticFiles(directory="frontend/static"), name="static")
-templates = Jinja2Templates(directory="frontend/templates")
+# Configuración de archivos estáticos y templates con rutas absolutas
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+app.mount("/static", StaticFiles(directory=str(BASE_DIR / "frontend" / "static")), name="static")
+templates = Jinja2Templates(directory=str(BASE_DIR / "frontend" / "templates"))
 
 
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
     """Sirve la interfaz principal."""
-    try:
-        return templates.TemplateResponse("index.html", {"request": request})
-    except Exception as e:
-        print(f"Error rendering template: {e}")
-        return HTMLResponse("<h1>FiltroFácil - Error al cargar plantilla. Contacta al administrador.</h1>")
+    return templates.TemplateResponse("index.html", {"request": request})
 
 
 @app.get("/about", response_class=HTMLResponse)
 async def read_about(request: Request):
     """Sirve la página acerca de."""
-    try:
-        return templates.TemplateResponse("about.html", {"request": request})
-    except Exception as e:
-        print(f"Error rendering about template: {e}")
-        return HTMLResponse("<h1>Error al cargar About</h1>")
+    return templates.TemplateResponse("about.html", {"request": request})
