@@ -33,10 +33,18 @@ templates = Jinja2Templates(directory="frontend/templates")
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
     """Sirve la interfaz principal."""
-    return templates.TemplateResponse("index.html", {"request": request})
+    try:
+        return templates.TemplateResponse("index.html", {"request": request})
+    except Exception as e:
+        print(f"Error rendering template: {e}")
+        return HTMLResponse("<h1>FiltroFácil - Error al cargar plantilla. Contacta al administrador.</h1>")
 
 
 @app.get("/about", response_class=HTMLResponse)
 async def read_about(request: Request):
     """Sirve la página acerca de."""
-    return templates.TemplateResponse("about.html", {"request": request})
+    try:
+        return templates.TemplateResponse("about.html", {"request": request})
+    except Exception as e:
+        print(f"Error rendering about template: {e}")
+        return HTMLResponse("<h1>Error al cargar About</h1>")
